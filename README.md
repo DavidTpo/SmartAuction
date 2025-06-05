@@ -7,7 +7,7 @@
 - Partial refunds during auction  
 
 ## 🛠 Technologies  
-- Solidity ^0.8.0  
+- Solidity 0.8.30 
 - Remix IDE  
 
 ## 🚀 Quick Start  
