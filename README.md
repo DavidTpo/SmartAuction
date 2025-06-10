@@ -46,6 +46,99 @@ struct Bid {
     bool refunded;      // Flag indicating if refunded
 }
 
+## Function Reference
+
+### Core Functions
+
+#### `constructor(uint256 _initialDuration)`
+- **Initializes** auction parameters  
+- **Parameters**:  
+  `_initialDuration`: Initial auction duration in seconds  
+- **Effects**:  
+  - Sets immutable `owner` to deployer  
+  - Records `startTime` as block timestamp  
+  - Calculates initial `endTime`  
+
+### Participant Functions
+
+#### `placeBid() payable`
+- **Processes** new ETH bid  
+- **Requirements**:  
+  - Auction must be active (`whenActive`)  
+  - Bid value > 0  
+  - For non-first bids: ≥5% higher than current  
+- **Effects**:  
+  - Extends auction by 10 minutes if in final 10 minutes  
+  - Updates highest bid and bidder  
+  - Records bid in history  
+  - Emits `NewBid`  
+
+#### `withdrawExcess()`
+- **Withdraws** non-winning bid amounts  
+- **Requirements**:  
+  - Auction active (`whenActive`)  
+  - Available funds to withdraw  
+- **Effects**:  
+  - For non-winners: withdraws all eligible funds  
+  - For current winner: withdraws only excess above winning bid  
+  - Updates refund statuses  
+  - Emits `PartialWithdrawal`  
+
+### Finalization Functions
+
+#### `endAuction()`
+- **Finalizes** the auction  
+- **Requirements**:  
+  - Auction time has ended  
+  - Not already finalized  
+- **Effects**:  
+  - Transfers winning amount (minus 2% commission) to owner  
+  - Sets `isAuctionEnded` flag  
+  - Emits `AuctionEnded`  
+
+#### `claimRefund()`
+- **Processes** refunds for losing bidders  
+- **Requirements**:  
+  - Auction ended (`whenEnded`)  
+  - Pending balance available (`hasRefunds`)  
+- **Effects**:  
+  - Transfers refund amount to caller  
+  - Updates pending returns  
+  - Emits `Refund`  
+
+## View Functions
+
+| Function | Returns | Description |
+|----------|---------|-------------|
+| `getWinner()` | `(address, uint256)` | Returns winner and winning amount |
+| `getAllBids()` | `Bid[]` | Returns complete bid history |
+| `getBidsByAddress(address)` | `Bid[]` | Returns bids for specific address |
+| `getTimeRemaining()` | `uint256` | Returns seconds until auction end |
+
+## Development Notes
+
+### Testing Methodology
+- Used shortened time intervals (5-15 minutes) for efficient validation
+- Verified all edge cases:
+  - Last-minute bid extensions
+  - Exact 5% increment bids
+  - Multiple concurrent withdrawals
+  - Commission calculation accuracy
+
+### Optimization Highlights
+- Immutable variables for gas efficiency
+- Cached storage reads in loops
+- Pre-increment counters in unchecked blocks
+- Short error messages to reduce bytecode size
+- Pull pattern for secure refund handling
+
+### Deployment Checklist
+1. Verify constructor parameters
+2. Test with reduced time intervals
+3. Confirm commission calculations
+4. Validate refund functionality
+5. Verify event emissions
+
 ## Testing Notes
 
 For development purposes, we used reduced time intervals (typically 5-15 minutes) to validate contract functionality efficiently while maintaining identical logical behavior to production timelines.
