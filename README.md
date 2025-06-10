@@ -1,6 +1,6 @@
 # SmartAuction Contract
 
-![Solidity](https://img.shields.io/badge/Solidity-0.8.0-blue?logo=solidity)
+![Solidity](https://img.shields.io/badge/Solidity-0.8.30-blue?logo=solidity)
 ![License](https://img.shields.io/badge/License-MIT-green)
 ![Optimized](https://img.shields.io/badge/Optimized-Gas%20Efficient-brightgreen)
 
